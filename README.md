@@ -73,6 +73,11 @@ Projeto desenvolvido com **HTML5, CSS3 e JavaScript puro** (Vanilla JS), sem fra
 - João Silva: joao@email.com / 123456
 - Maria Santos: maria@email.com / 123456
 
+## Como rodar o protótipo do projeto
+
+-git clone https://github.com/janainasouza-dev/ruifto.git
+-coloque no navegador o arquivo index.html
+
 ### Destaques Técnicos
 
 - **Semântica HTML:** uso de tags como `<nav>`, `<main>`, `<section>`, `<article>` e `<footer>` para estruturar o conteúdo corretamente;
