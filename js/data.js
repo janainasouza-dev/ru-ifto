@@ -2,7 +2,7 @@
 // DADOS DO SISTEMA — RU IFTO
 // ============================================
 
-// Valor cobrado por refeição avulsa (não subsidiada) para visitantes
+// Valor cobrado por refeição avulsa  para visitantes,estudante que pagara em dinheiro ou servidores 
 const PRECO_REFEICAO_VISITANTE = 13.00;
 
 // Usuários pré-cadastrados
@@ -27,8 +27,8 @@ const USERS = [
         email: 'joao@email.com',
         password: '123456',
         role: 'aluno',
-        matricula: '2024001',
-        curso: 'Ciência da Computação',
+        matricula: '202512170015',
+        curso: 'Engenharia Agrônomica',
         auxilio_ativo: true,
         tickets_totais: 20,
         tickets_usados: 2,
@@ -41,8 +41,8 @@ const USERS = [
         email: 'maria@email.com',
         password: '123456',
         role: 'aluno',
-        matricula: '2024002',
-        curso: 'Engenharia Civil',
+        matricula: '202512170013',
+        curso: 'Análise de Sistemas',
         auxilio_ativo: true,
         tickets_totais: 20,
         tickets_usados: 5,
