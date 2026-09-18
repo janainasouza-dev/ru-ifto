@@ -2,6 +2,14 @@
 
 Sistema web para otimizar o processo de reserva de refeições, controlar o fluxo de alunos e gerenciar o auxílio estudantil no Restaurante Universitário (RU) do Instituto Federal do Tocantins.
 
+## Desenvolvedores:
+
+- Janaína Souza 
+- Maria Fernanda
+- Rodrigo Britto
+- Eduardo 
+- Emerson
+
 ## O Problema
 
 O Restaurante Universitário do IFTO enfrenta desafios como:
