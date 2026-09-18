@@ -63,6 +63,20 @@ const USERS = [
         tickets_disponiveis: 0,
         periodo: '-',
         valor_refeicao: PRECO_REFEICAO_VISITANTE
+    },
+    {
+        id: 5,
+        name: 'Janaina',
+        email: 'janaina@email.com',
+        password: '123456',
+        role: 'aluno',
+        matricula: '202512170016',
+        curso: 'Análise de Sistemas',
+        auxilio_ativo: true,
+        tickets_totais: 20,
+        tickets_usados: 5,
+        tickets_disponiveis: 15,
+        periodo: '2024.2'
     }
 ];
 

@@ -10,8 +10,7 @@ function renderDashboard() {
         return;
     }
 
-    // Administrador não usa o dashboard de aluno/visitante:
-    // vai direto para o Painel Administrativo, sem cliques extras.
+    // Administrador usa o dashboard então vai direto ao painel administrativo
     if (isAdmin()) {
         renderAdmin();
         return;

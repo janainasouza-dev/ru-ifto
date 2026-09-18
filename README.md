@@ -99,6 +99,7 @@ Por se tratar de um trabalho acadêmico de frontend, as senhas dos usuários est
 
 - Integração com um backend real (Node.js ou PHP);
 - Integração com a API do IFTO para validação automática de matrículas;
-- Adicionar aba cardápio da semana;
+- Adicionar aba cardápio da semana(admin);
+- Utilizar biometria para confirma presença no r.u; 
 - Implementação de pagamento via PIX para visitantes.
 
