@@ -83,8 +83,8 @@ Projeto desenvolvido com **HTML5, CSS3 e JavaScript puro** (Vanilla JS), sem fra
 
 ## Como rodar o protótipo do projeto
 
--git clone https://github.com/janainasouza-dev/ruifto.git
--coloque no navegador o arquivo index.html
+- git clone https://github.com/janainasouza-dev/ruifto.git
+- coloque no navegador o arquivo index.html
 
 ### Destaques Técnicos
 
