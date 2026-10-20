@@ -53,7 +53,7 @@ O **RU IFTO** propõe uma solução digital para resolver esses gargalos, trazen
 ## Regras de Negócio
 
 - **Controle de Tickets:** o sistema abate automaticamente 1 ticket ao reservar e devolve o ticket caso a reserva seja cancelada;
-- **Prazo de Cancelamento:** cancelamentos só são permitidos até as **10h da manhã** (`dentroDoPrazoCancelamento`);
+- **Prazo de Cancelamento:** cancelamentos só são permitidos até as **9:30h da manhã** (`dentroDoPrazoCancelamento`);
 - **Gestão de Vagas:** as vagas disponíveis são decrementadas em tempo real, e o status da refeição muda automaticamente para "Lotado" quando esgotadas;
 - **Separação de Perfis:** Admin, Aluno e Visitante possuem visões e permissões distintas dentro do sistema.
 
