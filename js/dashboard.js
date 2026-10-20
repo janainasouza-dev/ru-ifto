@@ -263,7 +263,7 @@ function cancelarReserva(reservaId) {
     if (!currentUser) return;
 
     if (!dentroDoPrazoCancelamento()) {
-        showToast('❌ Prazo de cancelamento expirado (até 10h)!', 'error');
+        showToast('❌ Prazo de cancelamento expirado (até 9:30h)!', 'error');
         return;
     }
 

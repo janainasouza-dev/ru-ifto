@@ -209,5 +209,11 @@ function getTipoRefeicao(tipo) {
 function dentroDoPrazoCancelamento() {
     const agora = new Date();
     const hora = agora.getHours();
-    return hora < 10;
+    const minutos = agora.getMinutes();
+    //const minutos adicionado pois precisaremos calcular horario
+
+    return hora < 9 || (hora === 9 && minutos <= 30);
+
+    // trecho antigo  
+    // return hora < 10;
 }
