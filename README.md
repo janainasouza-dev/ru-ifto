@@ -111,3 +111,4 @@ Por se tratar de um trabalho acadêmico de frontend, as senhas dos usuários est
 - Utilizar biometria para confirma presença no r.u; 
 - Implementação de pagamento via PIX para visitantes.
 
+### modifiquei a regra de negócio
