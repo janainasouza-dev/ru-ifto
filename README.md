@@ -1,113 +1,81 @@
-# RU IFTO — Restaurante Universitário
+# RU IFTO — Restaurante Universitário (PHP + OO + MySQL)
 
-Sistema web para otimizar o processo de reserva de refeições, controlar o fluxo de alunos e gerenciar o auxílio estudantil no Restaurante Universitário (RU) do Instituto Federal do Tocantins.
+Sistema web para reserva de almoço, controle de tickets do auxílio estudantil e gestão do Restaurante Universitário do IFTO.
+Esta versão implementa a **parte funcional** do protótipo front-end: PHP orientado a objetos, banco MySQL, PDO com *prepared statements*, sessões e senhas criptografadas.
 
-## Desenvolvedores:
+## Desenvolvedores
+Janaína Souza · Maria Fernanda · Rodrigo Britto · Eduardo · Emerson
 
-- Janaína Souza 
-- Maria Fernanda
-- Rodrigo Britto
-- Eduardo 
-- Emerson
+## Como rodar (XAMPP / WAMP / Laragon)
+1. Copie a pasta do projeto para `htdocs/ruifto` (ou `www/ruifto`).
+2. Inicie **Apache** e **MySQL**.
+3. Importe `database/ruifto.sql` (phpMyAdmin → Importar, ou `mysql -u root < database/ruifto.sql`). O script cria o banco `ruifto`, as tabelas e os dados iniciais.
+4. Se seu MySQL não for `root` sem senha, ajuste `config/config.php` (`DB_USER`, `DB_PASS`) — ou use as variáveis de ambiente `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`.
+5. Acesse `http://localhost/ruifto/`.
 
-## O Problema
-
-O Restaurante Universitário do IFTO enfrenta desafios como:
-
-- Filas longas na hora do almoço;
-- Dificuldade de controle de acesso;
-- Desperdício de comida por falta de previsibilidade da demanda.
-
-O **RU IFTO** propõe uma solução digital para resolver esses gargalos, trazendo agilidade ao atendimento e substituindo o controle manual por um sistema de reservas.
-
-## Público-Alvo
-
-- **Alunos** (com e sem auxílio estudantil ativo)
-- **Visitantes** (sem necessidade de cadastro prévio)
-- **Administradores** (gestão do sistema)
-
-##  Funcionalidades
-
-### Login e Cadastro
-- Validação de campos (e-mail e senha);
-- Opção **"Entrar como Visitante"**, sem necessidade de cadastro prévio.
-
-### Dashboard do Aluno
-- Visualização do cardápio do dia (almoço);
-- Reserva de refeição disponível apenas se o aluno tiver **auxílio ativo** e **tickets disponíveis**;
-- Desconto automático de 1 ticket ao confirmar a reserva;
-- Histórico de tickets consumidos;
-- Histórico de reservas realizadas.
-
-### Dashboard do Visitante
-- Não utiliza tickets do auxílio estudantil;
-- Valor da refeição cobrado à parte (**R$ 13,00**), pago diretamente no caixa do RU;
-- Limite de **1 reserva ativa por vez**.
-
-### Painel Administrativo
-- Acesso restrito (tentativa de acesso negado para usuários não administradores);
-- Estatísticas gerais: total de alunos, alunos com auxílio ativo, reservas do dia e receita avulsa;
-- Listagem de alunos cadastrados com status do auxílio;
-- Controle de vagas do almoço do dia em tempo real.
-
-## Regras de Negócio
-
-- **Controle de Tickets:** o sistema abate automaticamente 1 ticket ao reservar e devolve o ticket caso a reserva seja cancelada;
-- **Prazo de Cancelamento:** cancelamentos só são permitidos até as **9:30h da manhã** (`dentroDoPrazoCancelamento`);
-- **Gestão de Vagas:** as vagas disponíveis são decrementadas em tempo real, e o status da refeição muda automaticamente para "Lotado" quando esgotadas;
-- **Separação de Perfis:** Admin, Aluno e Visitante possuem visões e permissões distintas dentro do sistema.
-
-##  Arquitetura e Tecnologias
-
-Projeto desenvolvido com **HTML5, CSS3 e JavaScript puro** (Vanilla JS), sem frameworks ou dependências de build.
-
-### Estrutura de Arquivos
-
-```
-├── index.html          # Ponto de entrada e estrutura semântica
-├── css/
-│   └── style.css       # Estilização, responsividade e design system
-├── js/
-│   ├── data.js          # "Banco de dados" simulado (usuários, refeições, reservas)
-│   ├── auth.js           # Lógica de autenticação e controle de sessão
-│   ├── dashboard.js  # Renderização dinâmica das telas do usuário
-│   └── app.js             # Inicialização e roteamento básico
-└── assets/icons/       # Favicons e ícones do PWA
-```
+Alternativa sem Apache: na pasta **acima** do projeto, `php -S localhost:8000` e abra `http://localhost:8000/ruifto/`.
+Requisitos: PHP 8.1+ com `pdo_mysql`.
 
 ## Contas para teste
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Administrador | admin@ru.com | admin123 |
+| Aluno | joao@email.com | 123456 |
+| Aluno | maria@email.com | 123456 |
+| Aluno | janaina@email.com | 123456 |
+| Visitante | botão **Entrar como Visitante** (sem senha) | — |
 
-- Administrador: admin@ru.com / admin123
-- João Silva: joao@email.com / 123456
-- Maria Santos: maria@email.com / 123456
+## Banco de dados (`database/ruifto.sql`)
+- **usuarios** — admin, aluno e visitante (senha em `bcrypt`, auxílio, tickets, valor avulso).
+- **refeicoes** — almoço de cada dia (cardápio, vagas totais/disponíveis, status).
+- **reservas** — usuário × refeição (status `confirmada/utilizada/cancelada`, valor, datas).
+- **tickets** — histórico de consumo/devolução do auxílio.
 
-## Como rodar o protótipo do projeto
+Relacionamentos: `reservas → usuarios`, `reservas → refeicoes`, `tickets → usuarios`, `tickets → reservas` (chaves estrangeiras).
 
-- git clone https://github.com/janainasouza-dev/ruifto.git
-- coloque no navegador o arquivo index.html
+## Orientação a objetos (`src/`)
+| Classe | Responsabilidade |
+|---|---|
+| `Database` | Conexão PDO única (Singleton) |
+| `Model` (abstrata) | `fromRow`, `buscar`, `excluir` reutilizados pelas entidades |
+| `Usuario` | Entidade + validação + CRUD + hash/verificação de senha |
+| `Refeicao` | Entidade + validação + CRUD + almoço do dia |
+| `Reserva` | Regras de negócio: vagas, tickets, visitante, prazo de cancelamento (transações) |
+| `Ticket` | Histórico de tickets |
+| `Auth` | Login/logout por sessão, proteção de páginas (`exigirLogin`, `exigirAdmin`) |
 
-### Destaques Técnicos
+## CRUD
+| Entidade | Create | Read | Update | Delete |
+|---|---|---|---|---|
+| Usuários | `admin/usuario_form.php`, `register.php` | `admin/usuarios.php` (busca/filtro) | `admin/usuario_form.php`, `perfil.php` | `admin/usuarios.php` |
+| Refeições | `admin/refeicao_form.php` | `admin/refeicoes.php`, `dashboard.php` | `admin/refeicao_form.php` | `admin/refeicoes.php` |
+| Reservas | `reservar.php` | `dashboard.php`, `historico.php`, `admin/reservas.php` | `cancelar.php`, `admin/reservas.php` (utilizada/cancelada) | `admin/reservas.php` |
+| Tickets | automático ao reservar | `tickets.php` | devolução automática ao cancelar | — |
 
-- **Semântica HTML:** uso de tags como `<nav>`, `<main>`, `<section>`, `<article>` e `<footer>` para estruturar o conteúdo corretamente;
-- **Responsividade:** layout adaptável a celulares e tablets, com uso de *Media Queries* no CSS;
-- **CSS:** uso de variáveis CSS (`:root`) para manter a paleta de cores institucional (verde) consistente e facilitar a manutenção, além de Flexbox e Grid para o layout responsivo;
-- **JavaScript / SPA:** aplicação estruturada como uma *Single Page Application* (SPA) rudimentar, em que o conteúdo de `<main>` é substituído dinamicamente via JavaScript, sem recarregar a página inteira;
-- **Persistência local:** uso de `localStorage` para manter o usuário logado mesmo após atualizar a página;
-- **Simulação de banco de dados:** o arquivo `data.js` simula o que seria o banco de dados e as regras de negócio do servidor, permitindo testar o frontend de forma isolada. Funções auxiliares, como `getAlmocoDoDia`, filtram as informações conforme a necessidade da tela.
-
-## Design
-
-Interface limpa, moderna e focada na usabilidade (UX), utilizando a paleta de cores institucional (verde) do IFTO.
+## Regras de negócio (mantidas do protótipo)
+- Aluno só reserva com **auxílio ativo** e **tickets disponíveis**; 1 ticket é descontado ao reservar e devolvido ao cancelar.
+- Visitante não usa tickets, paga **R$ 13,00** no caixa e só pode ter **1 reserva ativa**.
+- Cancelamento só até **9:30h** (fuso `America/Araguaina`).
+- Vagas decrementadas em transação (`SELECT ... FOR UPDATE`); status vira **Lotado** ao zerar.
+- Só o almoço **do dia** pode ser reservado.
 
 ## Segurança
+- **PDO + prepared statements** em todas as consultas (sem SQL Injection).
+- Senhas com `password_hash()` / `password_verify()` (bcrypt).
+- Sessões: cookie `HttpOnly` + `SameSite`, `session_regenerate_id()` no login, logout destrói a sessão.
+- Páginas internas exigem login; `/admin/*` exige perfil administrador.
+- **Token CSRF** em todos os formulários POST; saída escapada com `htmlspecialchars` (XSS).
+- Validação de dados no PHP (e-mail, tamanho de senha, datas, vagas, tickets).
 
-Por se tratar de um trabalho acadêmico de frontend, as senhas dos usuários estão expostas diretamente no código-fonte (`data.js`). Em um ambiente de produção real, seria utilizado um backend seguro, com autenticação e armazenamento de senhas criptografado.
-
-## Melhorias Futuras
-
-- Integração com um backend real (Node.js ou PHP);
-- Integração com a API do IFTO para validação automática de matrículas;
-- Adicionar aba cardápio da semana(admin);
-- Utilizar biometria para confirma presença no r.u; 
-- Implementação de pagamento via PIX para visitantes.
-
+## Estrutura
+```
+ruifto/
+├── index.php  login.php  register.php  logout.php  visitante.php
+├── dashboard.php  reservar.php  cancelar.php  tickets.php  historico.php  perfil.php
+├── admin/            index, usuarios, usuario_form, refeicoes, refeicao_form, reservas
+├── src/              Database, Model, Usuario, Refeicao, Reserva, Ticket, Auth, helpers
+├── config/config.php
+├── includes/         header.php, footer.php
+├── database/ruifto.sql
+└── assets/           css/ img/ icons/
+```
