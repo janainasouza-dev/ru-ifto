@@ -4,7 +4,7 @@ Sistema web para reserva de almoço, controle de tickets do auxílio estudantil 
 Esta versão implementa a **parte funcional** do protótipo front-end: PHP orientado a objetos, banco MySQL, PDO com *prepared statements*, sessões e senhas criptografadas.
 
 ## Desenvolvedores
-Janaína Souza · Maria Fernanda · Rodrigo Britto · Eduardo · Emerson
+Janaína F. de Souza · Maria Fernanda C. Pereira · Rodrigo G. Brito · Eduardo F. M. Gomes · Emerson F. C. de Oliveira
 
 ## Como rodar (XAMPP / WAMP / Laragon)
 1. Copie a pasta do projeto para `htdocs/ruifto` (ou `www/ruifto`).

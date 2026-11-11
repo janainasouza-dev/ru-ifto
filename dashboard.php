@@ -7,6 +7,8 @@ $ativas   = Reserva::listarPorUsuario($user->id, 'confirmada');
 $idsReservados = array_column($ativas, 'refeicao_id');
 $visitante = $user->isVisitante();
 $valor = (float) ($user->valor_refeicao ?: PRECO_REFEICAO_VISITANTE);
+// Visitante e aluno sem auxílio reservam e pagam na hora, no caixa
+$pagaNaHora = $visitante || !$user->auxilio_ativo;
 $podeCancelar = Reserva::dentroDoPrazoCancelamento();
 
 $titulo = 'Início';
@@ -15,6 +17,9 @@ require __DIR__ . '/includes/header.php';
 <div class="dashboard-header">
     <h1><?= $visitante ? '👤' : '🎓' ?> Bem-vindo, <?= e($user->nome) ?>!</h1>
     <p><?= $visitante ? 'Reserve seu almoço avulso no Restaurante Universitário' : 'Reserve seu almoço no Restaurante Universitário' ?></p>
+<?php if (!$visitante && !$user->auxilio_ativo): ?>
+    <p>Você está sem auxílio ativo: pode reservar normalmente pagando <?= e(dinheiro($valor)) ?> no caixa.</p>
+<?php endif; ?>
 </div>
 
 <section class="stats-grid" aria-label="Resumo da conta">
@@ -50,9 +55,8 @@ require __DIR__ . '/includes/header.php';
     $disp = $r->estaDisponivel();
     if ($jaReservou)            { $rotulo = '✅ Já Reservado'; $bloq = true; }
     elseif (!$disp)             { $rotulo = 'Lotado'; $bloq = true; }
-    elseif ($visitante)         { $rotulo = 'Reservar (' . dinheiro($valor) . ')'; $bloq = false; }
-    elseif (!$user->auxilio_ativo)           { $rotulo = 'Sem Auxílio'; $bloq = true; }
-    elseif ($user->ticketsDisponiveis() <= 0){ $rotulo = 'Sem Tickets'; $bloq = true; }
+    elseif ($pagaNaHora)        { $rotulo = 'Reservar (' . dinheiro($valor) . ')'; $bloq = false; }
+    elseif ($user->ticketsDisponiveis() <= 0) { $rotulo = 'Sem Tickets'; $bloq = true; }
     else                        { $rotulo = 'Reservar'; $bloq = false; }
 ?>
     <article class="refeicao-card <?= !$disp ? 'lotado' : '' ?>">
@@ -70,7 +74,7 @@ require __DIR__ . '/includes/header.php';
         <footer class="card-footer">
             <span class="vagas"><?= (int) $r->vagas_disponiveis ?>/<?= (int) $r->vagas_totais ?> vagas</span>
             <form method="post" action="<?= url('reservar.php') ?>" class="inline-form"
-                  <?= $visitante ? 'onsubmit="return confirm(\'Confirmar reserva avulsa no valor de ' . e(dinheiro($valor)) . ', a ser paga no caixa do RU?\')"' : '' ?>>
+                  <?= $pagaNaHora ? 'onsubmit="return confirm(\'Confirmar reserva no valor de ' . e(dinheiro($valor)) . ', a ser paga no caixa do RU?\')"' : '' ?>>
                 <?= csrfCampo() ?>
                 <input type="hidden" name="refeicao_id" value="<?= $r->id ?>">
                 <button class="btn-reservar <?= $jaReservou ? 'reservado' : '' ?>" <?= $bloq ? 'disabled' : '' ?>><?= e($rotulo) ?></button>
@@ -90,6 +94,9 @@ require __DIR__ . '/includes/header.php';
         <div class="reserva-info">
             <span class="titulo">🍽️ Almoço — <?= e(dataBR($a['refeicao_data'])) ?></span>
             <span class="data">📅 Reservado em <?= e(dataHora($a['data_reserva'])) ?></span>
+            <?php if ((float) $a['valor'] > 0): ?>
+                <span class="data">💵 Pagar no caixa: <?= e(dinheiro((float) $a['valor'])) ?></span>
+            <?php endif; ?>
         </div>
         <div style="display:flex;align-items:center;gap:1rem;">
             <span class="reserva-status confirmada">Confirmada</span>
