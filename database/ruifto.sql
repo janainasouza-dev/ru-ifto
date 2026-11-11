@@ -1,6 +1,13 @@
 -- ============================================
 -- RU IFTO — Script de criação e dados iniciais
 -- Banco: MySQL / MariaDB
+--
+-- Este script é SEGURO para rodar mais de uma vez:
+--   * não apaga tabelas nem dados existentes
+--   * cria tabelas só se ainda não existirem
+--   * ignora dados iniciais que já foram inseridos
+--
+-- Para zerar o banco durante o desenvolvimento, use reset_dev.sql
 -- ============================================
 
 SET NAMES utf8mb4;
@@ -11,15 +18,10 @@ CREATE DATABASE IF NOT EXISTS ruifto
 
 USE ruifto;
 
-DROP TABLE IF EXISTS tickets;
-DROP TABLE IF EXISTS reservas;
-DROP TABLE IF EXISTS refeicoes;
-DROP TABLE IF EXISTS usuarios;
-
 -- --------------------------------------------
 -- USUÁRIOS (admin, aluno, visitante)
 -- --------------------------------------------
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nome           VARCHAR(120) NOT NULL,
     email          VARCHAR(150) NOT NULL UNIQUE,
@@ -39,7 +41,7 @@ CREATE TABLE usuarios (
 -- --------------------------------------------
 -- REFEIÇÕES (almoço de cada dia)
 -- --------------------------------------------
-CREATE TABLE refeicoes (
+CREATE TABLE IF NOT EXISTS refeicoes (
     id                      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tipo                    ENUM('almoco') NOT NULL DEFAULT 'almoco',
     data                    DATE         NOT NULL,
@@ -58,7 +60,7 @@ CREATE TABLE refeicoes (
 -- --------------------------------------------
 -- RESERVAS (usuário x refeição)
 -- --------------------------------------------
-CREATE TABLE reservas (
+CREATE TABLE IF NOT EXISTS reservas (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     usuario_id      INT UNSIGNED NOT NULL,
     refeicao_id     INT UNSIGNED NOT NULL,
@@ -75,7 +77,7 @@ CREATE TABLE reservas (
 -- --------------------------------------------
 -- TICKETS (histórico de consumo do auxílio)
 -- --------------------------------------------
-CREATE TABLE tickets (
+CREATE TABLE IF NOT EXISTS tickets (
     id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT UNSIGNED NOT NULL,
     reserva_id INT UNSIGNED NULL,
@@ -88,10 +90,11 @@ CREATE TABLE tickets (
 ) ENGINE=InnoDB;
 
 -- ============================================
--- DADOS INICIAIS
+-- DADOS INICIAIS (somente para desenvolvimento/demonstração)
 -- Senhas (bcrypt):  admin123 | 123456 | visitante
+-- INSERT IGNORE: se o id já existir, a linha é ignorada
 -- ============================================
-INSERT INTO usuarios
+INSERT IGNORE INTO usuarios
 (id, nome, email, senha_hash, perfil, matricula, curso, periodo, auxilio_ativo, tickets_totais, tickets_usados, valor_refeicao) VALUES
 (1, 'Administrador', 'admin@ru.com',               '$2y$10$to9obC3.OqoHf/Z..fOTeub5qEmgnJbx5pJ.7UM8BoYik7f78D1Ze', 'admin',     'ADMIN001',     'Administração',         '2024.2', 0, 0,  0, 0.00),
 (2, 'João Silva',     'joao@email.com',            '$2y$10$vyUiszK2J5IAMb5VW6S7XOAKVUjWB0zAkteIO24ThQNVrZVkE22.O', 'aluno',     '202512170015', 'Engenharia Agronômica', '2024.2', 1, 20, 2, 0.00),
@@ -99,16 +102,17 @@ INSERT INTO usuarios
 (4, 'Visitante',      'visitante@ru.ifto.edu.br',  '$2y$10$sSuWUC0gibf3xXlwA9.utOGQInFlliXBYsY7wUfvqrz43ekCpBdZC', 'visitante',  '-',            '-',                     '-',      0, 0,  0, 13.00),
 (5, 'Janaina',        'janaina@email.com',         '$2y$10$vyUiszK2J5IAMb5VW6S7XOAKVUjWB0zAkteIO24ThQNVrZVkE22.O', 'aluno',     '202512170016', 'Análise de Sistemas',   '2024.2', 1, 20, 5, 0.00);
 
-INSERT INTO refeicoes
+INSERT IGNORE INTO refeicoes
 (id, tipo, data, cardapio_principal, cardapio_acompanhamento, cardapio_salada, cardapio_sobremesa, cardapio_suco, vagas_totais, vagas_disponiveis, status) VALUES
-(1, 'almoco', CURDATE(),                          'Arroz, feijão, bife acebolado',  'Batata frita', 'Salada verde com tomate', 'Pudim de leite', 'Suco de maracujá', 100, 32, 'disponivel'),
+(1, 'almoco', CURDATE(),                           'Arroz, feijão, bife acebolado',  'Batata frita',  'Salada verde com tomate', 'Pudim de leite', 'Suco de maracujá', 100, 32, 'disponivel'),
 (2, 'almoco', DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'Frango grelhado com legumes',    'Purê de batata','Salada de beterraba',     'Gelatina',       'Suco de limão',    100, 50, 'disponivel'),
 (3, 'almoco', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 'Arroz, feijão, carne de panela', 'Farofa',        'Salada de repolho',       'Banana',         'Suco de acerola',  100, 98, 'disponivel');
 
-INSERT INTO reservas (id, usuario_id, refeicao_id, status, tipo_usuario, valor, data_reserva, data_utilizacao) VALUES
+INSERT IGNORE INTO reservas (id, usuario_id, refeicao_id, status, tipo_usuario, valor, data_reserva, data_utilizacao) VALUES
 (1, 2, 3, 'utilizada', 'aluno', 0.00, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
 (2, 3, 3, 'utilizada', 'aluno', 0.00, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY));
 
-INSERT INTO tickets (usuario_id, reserva_id, quantidade, periodo, status, criado_em) VALUES
-(2, 1, 1, '2024.2', 'utilizada', DATE_SUB(NOW(), INTERVAL 2 DAY)),
-(3, 2, 1, '2024.2', 'utilizada', DATE_SUB(NOW(), INTERVAL 1 DAY));
+-- id fixo para evitar duplicar os registros ao rodar o script de novo
+INSERT IGNORE INTO tickets (id, usuario_id, reserva_id, quantidade, periodo, status, criado_em) VALUES
+(1, 2, 1, 1, '2024.2', 'utilizada', DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(2, 3, 2, 1, '2024.2', 'utilizada', DATE_SUB(NOW(), INTERVAL 1 DAY));
