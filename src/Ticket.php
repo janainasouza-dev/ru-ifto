@@ -20,11 +20,15 @@ class Ticket extends Model
         $st->execute([':u' => $usuarioId, ':r' => $reservaId, ':p' => $periodo]);
     }
 
-    /** Marca como devolvido o ticket ligado a uma reserva cancelada. */
-    public static function devolverDaReserva(int $reservaId): void
+    /**
+     * Marca como devolvido o ticket ligado a uma reserva cancelada.
+     * Retorna true se havia um ticket a devolver (false = reserva paga na hora, sem ticket).
+     */
+    public static function devolverDaReserva(int $reservaId): bool
     {
-        $st = self::db()->prepare("UPDATE tickets SET status = 'devolvida' WHERE reserva_id = :r");
+        $st = self::db()->prepare("UPDATE tickets SET status = 'devolvida' WHERE reserva_id = :r AND status = 'utilizada'");
         $st->execute([':r' => $reservaId]);
+        return $st->rowCount() > 0;
     }
 
     /** @return Ticket[] */

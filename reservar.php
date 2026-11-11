@@ -6,8 +6,12 @@ if (!ehPost()) {
 }
 validarCsrf();
 try {
-    Reserva::criar($user->id, (int) ($_POST['refeicao_id'] ?? 0));
-    flash('Reserva realizada com sucesso!', 'success');
+    $valor = Reserva::criar($user->id, (int) ($_POST['refeicao_id'] ?? 0));
+    $msg = 'Reserva realizada com sucesso!';
+    if ($valor > 0) {
+        $msg .= ' Pague ' . dinheiro($valor) . ' no caixa.';
+    }
+    flash($msg, 'success');
 } catch (RuntimeException $e) {
     flash($e->getMessage(), 'error');
 }

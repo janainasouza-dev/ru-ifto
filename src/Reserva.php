@@ -23,8 +23,11 @@ class Reserva extends Model
     }
 
     // ---------- CREATE ----------
-    /** @throws RuntimeException com a mensagem de regra violada */
-    public static function criar(int $usuarioId, int $refeicaoId): void
+    /**
+     * Cria a reserva e devolve o valor a pagar no caixa (0 = coberto pelo auxílio).
+     * @throws RuntimeException com a mensagem de regra violada
+     */
+    public static function criar(int $usuarioId, int $refeicaoId): float
     {
         $db = self::db();
         $db->beginTransaction();
@@ -58,6 +61,7 @@ class Reserva extends Model
             }
 
             $valor = 0.0;
+            $consomeTicket = false;
             if ($u->isVisitante()) {
                 $st = $db->prepare("SELECT COUNT(*) FROM reservas WHERE usuario_id = :u AND status = 'confirmada'");
                 $st->execute([':u' => $u->id]);
@@ -65,13 +69,15 @@ class Reserva extends Model
                     throw new RuntimeException('Visitante só pode ter 1 reserva ativa por vez!');
                 }
                 $valor = (float) ($u->valor_refeicao ?: PRECO_REFEICAO_VISITANTE);
-            } else {
-                if (!$u->auxilio_ativo) {
-                    throw new RuntimeException('Você não tem auxílio alimentação ativo!');
-                }
+            } elseif ($u->auxilio_ativo) {
+                // Aluno com auxílio: usa ticket e não paga nada
                 if ($u->ticketsDisponiveis() <= 0) {
                     throw new RuntimeException('Você não tem tickets disponíveis!');
                 }
+                $consomeTicket = true;
+            } else {
+                // Aluno sem auxílio: reserva e paga na hora, igual ao visitante (não usa ticket)
+                $valor = (float) ($u->valor_refeicao ?: PRECO_REFEICAO_VISITANTE);
             }
 
             $st = $db->prepare(
@@ -85,11 +91,12 @@ class Reserva extends Model
                  status = IF(vagas_disponiveis - 1 <= 0, 'lotado', 'disponivel') WHERE id = :id"
             )->execute([':id' => $r->id]);
 
-            if ($u->isAluno()) {
+            if ($consomeTicket) {
                 $db->prepare('UPDATE usuarios SET tickets_usados = tickets_usados + 1 WHERE id = :id')->execute([':id' => $u->id]);
                 Ticket::registrar($u->id, $reservaId, $u->periodo);
             }
             $db->commit();
+            return $valor;
         } catch (Throwable $e) {
             $db->rollBack();
             throw $e;
@@ -153,7 +160,7 @@ class Reserva extends Model
     {
         $st = self::db()->prepare(
             "SELECT COALESCE(SUM(valor),0) FROM reservas
-             WHERE tipo_usuario = 'visitante' AND status IN ('confirmada','utilizada') AND DATE(data_reserva) = :d"
+             WHERE valor > 0 AND status IN ('confirmada','utilizada') AND DATE(data_reserva) = :d"
         );
         $st->execute([':d' => date('Y-m-d')]);
         return (float) $st->fetchColumn();
@@ -241,10 +248,10 @@ class Reserva extends Model
             "UPDATE refeicoes SET vagas_disponiveis = LEAST(vagas_totais, vagas_disponiveis + 1), status = 'disponivel' WHERE id = :id"
         )->execute([':id' => $r->refeicao_id]);
 
-        if ($r->tipo_usuario === 'aluno') {
+        // Só devolve se a reserva consumiu ticket (aluno que pagou na hora não tem ticket)
+        if ($r->tipo_usuario === 'aluno' && Ticket::devolverDaReserva($r->id)) {
             $db->prepare('UPDATE usuarios SET tickets_usados = GREATEST(0, tickets_usados - 1) WHERE id = :id')
                ->execute([':id' => $r->usuario_id]);
-            Ticket::devolverDaReserva($r->id);
         }
     }
 }

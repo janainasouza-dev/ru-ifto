@@ -53,7 +53,8 @@ Relacionamentos: `reservas → usuarios`, `reservas → refeicoes`, `tickets →
 | Tickets | automático ao reservar | `tickets.php` | devolução automática ao cancelar | — |
 
 ## Regras de negócio (mantidas do protótipo)
-- Aluno só reserva com **auxílio ativo** e **tickets disponíveis**; 1 ticket é descontado ao reservar e devolvido ao cancelar.
+- Aluno **com auxílio ativo** reserva usando **tickets disponíveis**, sem pagar; 1 ticket é descontado ao reservar e devolvido ao cancelar.
+- Aluno **sem auxílio** reserva normalmente, **paga R$ 13,00 no caixa** (como o visitante) e não usa tickets; ao cancelar, nenhum ticket é devolvido.
 - Visitante não usa tickets, paga **R$ 13,00** no caixa e só pode ter **1 reserva ativa**.
 - Cancelamento só até **9:30h** (fuso `America/Araguaina`).
 - Vagas decrementadas em transação (`SELECT ... FOR UPDATE`); status vira **Lotado** ao zerar.
