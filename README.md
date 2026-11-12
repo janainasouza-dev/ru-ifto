@@ -9,7 +9,7 @@ Janaína F. de Souza · Maria Fernanda C. Pereira · Rodrigo G. Brito · Eduardo
 ## Como rodar (XAMPP / WAMP / Laragon)
 1. Copie a pasta do projeto para `htdocs/ruifto` (ou `www/ruifto`).
 2. Inicie **Apache** e **MySQL**.
-3. Importe `database/ruifto.sql` (phpMyAdmin → Importar, ou `mysql -u root < database/ruifto.sql`). O script cria o banco `ruifto`, as tabelas e os dados iniciais.
+3. Importe `database/ruifto.sql` (phpMyAdmin → Importar, ou `mysql -u root < database/ruifto.sql`). O script cria o banco `ruifto`, as tabelas e os dados iniciais. (Opcional, demonstração) Importe database/seed_refeicoes.sql para cadastrar os almoços dos próximos 30 dias.
 4. Se seu MySQL não for `root` sem senha, ajuste `config/config.php` (`DB_USER`, `DB_PASS`) — ou use as variáveis de ambiente `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`.
 5. Acesse `http://localhost/ruifto/`.
 
