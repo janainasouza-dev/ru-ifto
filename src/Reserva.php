@@ -50,6 +50,12 @@ class Reserva extends Model
             if ($r->data !== date('Y-m-d')) {
                 throw new RuntimeException('Só é possível reservar o almoço do dia.');
             }
+            // Reservas encerram no mesmo horário limite do cancelamento
+            if (!self::dentroDoPrazoCancelamento()) {
+                throw new RuntimeException(
+                    sprintf('As reservas de hoje foram encerradas (até %d:%02dh)!', CANCELAMENTO_HORA, CANCELAMENTO_MINUTO)
+                );
+            }
             if (!$r->estaDisponivel()) {
                 throw new RuntimeException('Não há vagas disponíveis!');
             }

@@ -80,10 +80,10 @@ ruifto/
 ├── database/ruifto.sql
 └── assets/           css/ img/ icons/
 ```
-
-## Correções importantes e melhorias 
+## Correções importantes e melhorias
 
 - Exclusão em cascata: apagar um usuário ou refeição remove as reservas (e os tickets do usuário) vinculadas.
-- Melhoria planejada: bloquear a exclusão quando houver histórico e desativar usuários em vez de excluí-los
-  (script pronto em migracao_sem_cascade.sql para ser implantado em um momento mais oportuno).
-- QR Code Pix e e-mail de confirmação com rabbitMQ.
+- Melhoria planejada: bloquear a exclusão quando houver histórico e desativar usuários em vez de excluí-los (script pronto em migracao_sem_cascade.sql para ser implantado em um momento mais oportuno).
+- QR Code Pix e 
+- E-mail de confirmação com rabbitMQ.
+- Acrescentar período no cadastro. 

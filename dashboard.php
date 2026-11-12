@@ -10,6 +10,7 @@ $valor = (float) ($user->valor_refeicao ?: PRECO_REFEICAO_VISITANTE);
 // Visitante e aluno sem auxílio reservam e pagam na hora, no caixa
 $pagaNaHora = $visitante || !$user->auxilio_ativo;
 $podeCancelar = Reserva::dentroDoPrazoCancelamento();
+$podeReservar = $podeCancelar; // reservas encerram no mesmo horário do cancelamento
 
 $titulo = 'Início';
 require __DIR__ . '/includes/header.php';
@@ -55,6 +56,7 @@ require __DIR__ . '/includes/header.php';
     $disp = $r->estaDisponivel();
     if ($jaReservou)            { $rotulo = '✅ Já Reservado'; $bloq = true; }
     elseif (!$disp)             { $rotulo = 'Lotado'; $bloq = true; }
+    elseif (!$podeReservar)     { $rotulo = 'Reservas encerradas'; $bloq = true; }
     elseif ($pagaNaHora)        { $rotulo = 'Reservar (' . dinheiro($valor) . ')'; $bloq = false; }
     elseif ($user->ticketsDisponiveis() <= 0) { $rotulo = 'Sem Tickets'; $bloq = true; }
     else                        { $rotulo = 'Reservar'; $bloq = false; }
